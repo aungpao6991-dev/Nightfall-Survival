@@ -45,7 +45,7 @@ All unspecified stats use the default: 100 maximum vitality, 1.0× movement spee
 | Legendary | Draven | Heaven Sword | 1.08× attack speed |
 | Legendary | Seraphine | Soul Eater | 120 maximum vitality |
 | Mythic | Mimi | Chrono Gear | 1.05× movement speed |
-| Mythic | Mortis | Grim Reaper's Scythe | 1.12 Might |
+| Mythic | Mortis | Grim Reaper's Scythe | 1.20 Might |
 | Mythic | Solara | Armageddon Cannon | 120 maximum vitality |
 
 The “bonus” label shown on some selection cards is descriptive. The implemented stat in this table is authoritative where the two differ.
@@ -60,8 +60,8 @@ Rarity is an item's fixed tier, not its upgrade level. The following multiplier 
 | Uncommon | Green | 1.06× | 25 |
 | Rare | Blue | 1.14× | 14 |
 | Epic | Purple | 1.23× | 8 |
-| Legendary | Yellow | 1.34× | 3 |
-| Mythic | Red | 1.48× | 0.6 |
+| Legendary | Yellow | 1.65× | 3 |
+| Mythic | Red | 1.95× | 0.6 |
 
 Level-up choices are sampled by tier weight, then by an available item in that tier. Clover and Lucky Coin increase the higher-tier weights. Because tiers may have different numbers of available choices, these weights are not direct per-item probabilities.
 
@@ -212,7 +212,7 @@ Base speeds are world units/second. Contact damage is the raw damage before play
 ## 8. Notes about implementation values
 
 - Weapon base damage is a shared formula, while each weapon applies its own coefficient, target rules, and effect duration. Therefore the table is not a single fixed damage value for every run.
-- Player power growth has been reduced: rarity multipliers now range from 1.00× to 1.48×, weapon-level damage rises by 12% per level, Might level-ups add 6%, and the later XP threshold grows by 1.4× plus 4. Enemy base HP and its time-scaling curve have also been raised, so basic enemies take more than one hit to defeat from the start and continue gaining durability later.
+- Player power growth has been reduced for Common through Epic: rarity multipliers are 1.00×, 1.06×, 1.14× and 1.23×. Legendary and Mythic retain stronger endgame power at 1.65× and 1.95×. Weapon-level damage rises by 12% per level, Might level-ups add 6%, and the later XP threshold grows by 10% over the previous curve. Enemy base HP and its time-scaling curve have also been raised, so basic enemies take more than one hit to defeat from the start and continue gaining durability later.
 - Weapon rarity and evolution damage have been tuned down to make damage progression less explosive. Grim Reaper's Scythe damage is reduced to 1.9× base per regular hit; Soul Bind Chain life-steal is 2.5% of damage (5% evolved) plus a separate 10% chance per vampiric hit to restore 0.75 vitality; Armageddon Cannon fires every 16 seconds and deals 58% of current HP to ordinary foes and 42% to elites rather than instantly defeating them.
 - Evolved weapons are not ordinary level-up weapon choices; they are produced by chest evolution. Some Legendary wanderers start with an evolved weapon.
 - Item rarity multipliers are applied where the implementation calls `itemPower`/`passivePower`; not every effect uses rarity scaling in the same way.

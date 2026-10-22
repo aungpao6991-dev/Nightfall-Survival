@@ -25,7 +25,7 @@
         { id: "aurelia", name: "Aurelia", rarity: "Legendary", weapon: "Holy Wand", icon: "✧", description: "A radiant oracle whose spell never rests.", bonus: "+15% attack speed", stats: { attackSpeed: 1.15 } },
         { id: "draven", name: "Draven", rarity: "Legendary", weapon: "Heaven Sword", icon: "⚔", description: "A fallen champion wielding a blade of judgment.", bonus: "+8% attack speed", stats: { attackSpeed: 1.08 } },
         { id: "seraphine", name: "Seraphine", rarity: "Legendary", weapon: "Soul Eater", icon: "☼", description: "A saint whose endless aura drains the horde.", bonus: "+20 maximum vitality", stats: { maxHp: 120 } },
-        { id: "mortis", name: "Mortis", rarity: "Mythic", weapon: "Grim Reaper's Scythe", icon: "☠", description: "An avatar of endings, sweeping whole ranks aside.", bonus: "+12% weapon might", stats: { might: 1.12 } },
+        { id: "mortis", name: "Mortis", rarity: "Mythic", weapon: "Grim Reaper's Scythe", icon: "☠", description: "An avatar of endings, sweeping whole ranks aside.", bonus: "+20% weapon might", stats: { might: 1.2 } },
         { id: "solara", name: "Solara", rarity: "Mythic", weapon: "Armageddon Cannon", icon: "☄", description: "A star-forged artillery master calling down ruin.", bonus: "+20% maximum vitality", stats: { maxHp: 120 } }
       ];
       const retiredCharacterNames = new Map([
@@ -110,8 +110,8 @@
         { name: "Uncommon", className: "green", power: 1.06, weight: 25 },
         { name: "Rare", className: "blue", power: 1.14, weight: 14 },
         { name: "Epic", className: "purple", power: 1.23, weight: 8 },
-        { name: "Legendary", className: "yellow", power: 1.34, weight: 3 },
-        { name: "Mythic", className: "red", power: 1.48, weight: .6 }
+        { name: "Legendary", className: "yellow", power: 1.65, weight: 3 },
+        { name: "Mythic", className: "red", power: 1.95, weight: .6 }
       ];
       const itemRarity = {
         "Magic Wand": "Common", "Whip": "Common", "Garlic": "Common",
