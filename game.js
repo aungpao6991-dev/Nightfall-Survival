@@ -144,6 +144,9 @@
       function itemPower(name) {
         return rarityForItem(name).power;
       }
+      function nextXpThreshold(currentThreshold) {
+        return Math.ceil((currentThreshold * 1.4 + 4) * 1.1);
+      }
       const enemyTypes = [
         { name: "Hollow", shape: "circle", color: "#8b5b86", hp: 34, speed: 42, radius: 11, damage: 9, xp: 1, gold: 1 },
         { name: "Imp", shape: "triangle", color: "#d26751", hp: 26, speed: 67, radius: 9, damage: 8, xp: 1, gold: 1 },
@@ -162,7 +165,7 @@
       ];
       const state = {
         mode: "menu", selected: "arcanist", player: null, enemies: [], projectiles: [], gems: [], particles: [], slashes: [], hazards: [], enemyAttacks: [], hitTexts: [],
-        time: 0, kills: 0, gold: 0, totalGold: 0, level: 1, xp: 0, xpNext: 8, rerolls: 0,
+        time: 0, kills: 0, gold: 0, totalGold: 0, level: 1, xp: 0, xpNext: 9, rerolls: 0,
         inventory: {}, passives: {}, might: 1, magnet: 1, moveSpeed: 180,
         spawnTimer: 0, attackTimer: 0, damageTimer: 0, guardianSpawned: false, bossDefeated: false, redDeathSpawned: false,
         chest: null, chestQueue: [], keys: {}, lastFrame: 0, shopLevel: 0, history: [],
@@ -323,7 +326,7 @@
         state.gold = 0;
         state.level = 1;
         state.xp = 0;
-        state.xpNext = 8;
+        state.xpNext = 9;
         state.rerolls = 0;
         state.might = (character.stats.might || 1) + state.shopLevel * .03;
         state.magnet = 1;
@@ -385,7 +388,7 @@
         state.wave++;
         state.nextWaveAt += 120;
         state.waveEndAt = state.time + 24;
-        const count = Math.max(0, Math.min(180 - state.enemies.length, 42, 16 + state.wave * 3));
+        const count = Math.max(0, Math.min(180 - state.enemies.length, 84, 32 + state.wave * 6));
         const distance = Math.max(GAME_WIDTH, GAME_HEIGHT) * .57 + 90;
         for (let i = 0; i < count; i++) {
           const angle = i / count * Math.PI * 2 + (Math.random() - .5) * .28;
@@ -725,7 +728,7 @@
         while (state.xp >= state.xpNext) {
           state.xp -= state.xpNext;
           state.level++;
-          state.xpNext = Math.ceil(state.xpNext * 1.4 + 4);
+          state.xpNext = nextXpThreshold(state.xpNext);
           openLevelUp();
           break;
         }
@@ -799,7 +802,7 @@
         if (state.xp >= state.xpNext) {
           state.xp -= state.xpNext;
           state.level++;
-          state.xpNext = Math.ceil(state.xpNext * 1.4 + 4);
+          state.xpNext = nextXpThreshold(state.xpNext);
           openLevelUp();
         }
       }
@@ -1025,7 +1028,7 @@
         }
 
         state.spawnTimer -= dt;
-        const spawnRate = Math.max(.22, .58 - state.time / 4200) * (state.time < state.waveEndAt ? 1.15 : 1);
+        const spawnRate = Math.max(.11, .29 - state.time / 8400) * (state.time < state.waveEndAt ? 1.15 : 1);
         if (state.spawnTimer <= 0) {
           if (state.enemies.length < 180) {
             spawnEnemy();

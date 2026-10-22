@@ -9,7 +9,7 @@ This document records the playable content and combat values currently implement
 - Default vitality is 100, movement speed is 180 world units/second, and attack interval is 0.72 seconds. A character's stat modifiers are listed below.
 - Weapons attack automatically. Weapon inventory is limited to 5 distinct weapons; weapon levels cap at 5.
 - Press Space to dash in the current movement direction (or the last facing direction when standing still). A dash lasts 0.16 seconds, moves at 3.2× normal movement speed, grants 0.2 seconds of invulnerability, and has a 1.1-second cooldown.
-- A level-up offers up to 3 choices. The first XP threshold is 8; each later threshold is `ceil(previous threshold × 1.4 + 4)`, slowing later level-ups compared with the earlier curve.
+- A level-up offers up to 3 choices. The first XP threshold is 9; each later threshold is `ceil((previous threshold × 1.4 + 4) × 1.1)`, requiring about 10% more XP per level than the previous curve.
 - At a level-up, spending one reroll replaces the offered choices. Skipping a level-up grants 2 rerolls for later level-ups; rerolls reset when a new run begins.
 - Weapon level affects its base damage by `1 + 0.12 × weapon level` (so level 1 is ×1.12 and level 5 is ×1.60). Some weapons also improve count, range, or behavior separately.
 - General weapon base damage is:
@@ -192,8 +192,8 @@ Base speeds are world units/second. Contact damage is the raw damage before play
 - Enemy contact damage also scales with time: `base damage × (1 + elapsed seconds / 1200)` (1.5× at 10 minutes and 2.5× at 30 minutes).
 - Elite enemies receive a further `+0.6` in the HP multiplier, 1.8× radius, 1.5× contact damage, and 12× XP and gold.
 - At 10:00, an elite Mimic guardian spawns with 4× the already-scaled elite HP. Defeating an elite creates a treasure chest.
-- A wave begins every 2 minutes. It includes up to `min(42, 16 + 3 × wave number)` regular enemies and one elite Mimic captain, without exceeding the 180-enemy field limit. If there is only room for regular wave enemies, the captain is skipped. The captain has an extra HP multiplier of `1.4 + 0.15 × wave number`. The wave also increases regular spawn frequency for 24 seconds.
-- Regular spawn frequency increases over time, with a minimum interval of 0.22 seconds; after 1:30, each spawn has an increasing chance of producing a second enemy (capped at 65%). The 180-enemy field limit remains in effect.
+- A wave begins every 2 minutes. It includes up to `min(84, 32 + 6 × wave number)` regular enemies and one elite Mimic captain, without exceeding the 180-enemy field limit. If there is only room for regular wave enemies, the captain is skipped. The captain has an extra HP multiplier of `1.4 + 0.15 × wave number`. The wave also increases regular spawn frequency for 24 seconds.
+- Regular spawn interval is half its previous value and shortens with elapsed time, down to a base minimum interval of 0.11 seconds (0.1265 seconds during the wave-frequency modifier). After 1:30, each spawn has an increasing chance of producing a second enemy (capped at 65%). The 180-enemy field limit remains in effect, so actual numbers may be lower when the field is full.
 - Hexers begin appearing after 4:00. They stop at range and mark the player's current location with a visible danger circle; after 0.95 seconds, the area deals 1.2× their scaled contact damage. Ravagers appear after 6:00; they telegraph a straight charge for 0.72 seconds, then rush along the indicated direction.
 - At 30:00, Red Death spawns as an elite. Applying the elapsed-time/elite scaling to its base values gives approximately 935,000 HP, 230 speed, 37,500 contact damage, 600 XP, and 1,200 gold at that moment.
 - Standard contact hits are reduced by Light Armor, Spike Mail armor, and Iron Plate; at least 1 damage is taken when the hit is not blocked by Aegis.
