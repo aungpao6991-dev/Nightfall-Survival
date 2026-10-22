@@ -9,15 +9,15 @@ This document records the playable content and combat values currently implement
 - Default vitality is 100, movement speed is 180 world units/second, and attack interval is 0.72 seconds. A character's stat modifiers are listed below.
 - Weapons attack automatically. Weapon inventory is limited to 5 distinct weapons; weapon levels cap at 5.
 - Press Space to dash in the current movement direction (or the last facing direction when standing still). A dash lasts 0.16 seconds, moves at 3.2× normal movement speed, grants 0.2 seconds of invulnerability, and has a 1.1-second cooldown.
-- A level-up offers up to 3 choices. The first XP threshold is 8; each later threshold is `ceil(previous threshold × 1.32 + 3)`.
+- A level-up offers up to 3 choices. The first XP threshold is 8; each later threshold is `ceil(previous threshold × 1.4 + 4)`, slowing later level-ups compared with the earlier curve.
 - At a level-up, spending one reroll replaces the offered choices. Skipping a level-up grants 2 rerolls for later level-ups; rerolls reset when a new run begins.
-- Weapon level affects its base damage by `1 + 0.16 × weapon level` (so level 1 is ×1.16 and level 5 is ×1.80). Some weapons also improve count, range, or behavior separately.
+- Weapon level affects its base damage by `1 + 0.12 × weapon level` (so level 1 is ×1.12 and level 5 is ×1.60). Some weapons also improve count, range, or behavior separately.
 - General weapon base damage is:
 
-  `base damage = weapon base × current Might × item rarity multiplier × (1 + 0.16 × weapon level) × evolution multiplier`
+  `base damage = weapon base × current Might × item rarity multiplier × (1 + 0.12 × weapon level) × evolution multiplier`
 
-  Weapon bases are 19 for Magic Wand, 28 for Cross, and 22 for other weapons. Evolved attacks use a ×2 evolution multiplier unless their individual behavior below specifies another coefficient.
-- Current Might includes character/shop Might and these multiplicative bonuses: Spinach `+10% per effective rank`, Small Gem `+5% per effective rank`, Dragon Heart `×1.5`, and Crown of Midas `+1% per 100 gold earned this run`. A Might level-up adds 0.1 to the Might stat.
+  Weapon bases are 19 for Magic Wand, 28 for Cross, and 22 for other weapons. Evolved attacks use a ×1.65 evolution multiplier unless their individual behavior below specifies another coefficient.
+- Current Might includes character/shop Might and these multiplicative bonuses: Spinach `+7% per effective rank`, Small Gem `+3.5% per effective rank`, Dragon Heart `×1.5`, and Crown of Midas `+1% per 100 gold earned this run`. A Might level-up adds 0.06 to the Might stat; each permanent Manor training rank adds 3% Might.
 - Critical hits normally double damage. Critical chance is up to `6% × effective Optic Lens rank + 10% × Precision Gloves rank`, capped at 85%; Starlight Shard has an additional built-in chance.
 - Attack interval is reduced by character attack speed, Empty Tome, Tactical Timer, and owning Rusted Dagger. Rusted Dagger applies a ×1.7 attack-speed factor to the shared weapon timer.
 - Extra projectiles from Arcane Bandolier and Grand Staff of Duplication are capped at 4 total. The passive rarity multiplier affects effective ranks where the game uses `passivePower`; one-rank effects often use their raw rank.
@@ -45,7 +45,7 @@ All unspecified stats use the default: 100 maximum vitality, 1.0× movement spee
 | Legendary | Draven | Heaven Sword | 1.08× attack speed |
 | Legendary | Seraphine | Soul Eater | 120 maximum vitality |
 | Mythic | Mimi | Chrono Gear | 1.05× movement speed |
-| Mythic | Mortis | Grim Reaper's Scythe | 1.20 Might |
+| Mythic | Mortis | Grim Reaper's Scythe | 1.12 Might |
 | Mythic | Solara | Armageddon Cannon | 120 maximum vitality |
 
 The “bonus” label shown on some selection cards is descriptive. The implemented stat in this table is authoritative where the two differ.
@@ -57,11 +57,11 @@ Rarity is an item's fixed tier, not its upgrade level. The following multiplier 
 | Tier | Display color | Power multiplier | Base level-up weight |
 |---|---|---:|---:|
 | Common | White | 1.00× | 50 |
-| Uncommon | Green | 1.12× | 25 |
-| Rare | Blue | 1.28× | 14 |
-| Epic | Purple | 1.50× | 8 |
-| Legendary | Yellow | 1.80× | 3 |
-| Mythic | Red | 2.20× | 0.6 |
+| Uncommon | Green | 1.06× | 25 |
+| Rare | Blue | 1.14× | 14 |
+| Epic | Purple | 1.23× | 8 |
+| Legendary | Yellow | 1.34× | 3 |
+| Mythic | Red | 1.48× | 0.6 |
 
 Level-up choices are sampled by tier weight, then by an available item in that tier. Clover and Lucky Coin increase the higher-tier weights. Because tiers may have different numbers of available choices, these weights are not direct per-item probabilities.
 
@@ -84,9 +84,9 @@ The damage coefficients below multiply the base damage formula in section 1 unle
 | Whip | Common | Instant horizontal slash, 105 range; hits foes within 30 vertical units for `1.00× base`. Bloody Tear has 155 range, 44 vertical tolerance, and `1.25×` its evolved base per hit. |
 | Garlic | Common | Damages all nearby enemies every attack; radius 68, damage `0.48× base`. Soul Eater radius is 100 and restores 0.15 vitality on each attack. |
 | Cross | Uncommon | Throws a returning sword at nearest foe within 440; projectile hit deals `1.00× base`. |
-| King Bible | Uncommon | Persistent orbiting books deal `10 × current Might` per second-scaled contact (damage is `projectile damage × dt × 3`). Starts with `2 + floor(level/3)` books. Unholy Vespers uses 5 books, a 68-unit orbit, and faster rotation. |
-| Soul Bind Chain | Rare | Hits all enemies in range 112 (168 evolved), damage `1.00× base` (1.15× evolved), and heals 4.5% of hit damage (9% evolved). The chain attack also has its own vampiric proc. |
-| Starlight Shard | Epic | Homing shot within 760; normal damage `1.00× base`, with built-in critical chance starting at 20%, plus 6% per effective Optic Lens rank and 10% per Precision Gloves rank (capped at 85%). A built-in critical deals 4.4× base damage after the normal critical multiplier. Supernova Prism fires 8 radial piercing stars, each flagged critical: 2.80× evolved base damage per hit, with 2 pierces. |
+| King Bible | Uncommon | Persistent orbiting books deal `10 × current Might` per second-scaled contact (damage is `projectile damage × dt × 3`). Starts with `2 + floor(level/3)` books. Unholy Vespers uses 5 books, a 68-unit orbit, faster rotation, and a ×1.65 evolution damage factor. |
+| Soul Bind Chain | Rare | Hits all enemies in range 112 (168 evolved), damage `1.00× base` (1.15× evolved), and heals 2.5% of hit damage (5% evolved). Vampiric hits have a separate 10% chance to restore 0.75 vitality. |
+| Starlight Shard | Epic | Homing shot within 760; normal damage `1.00× base`, with built-in critical chance starting at 20%, plus 6% per effective Optic Lens rank and 10% per Precision Gloves rank (capped at 85%). A built-in critical deals 4.4× base damage after the normal critical multiplier. Supernova Prism fires 8 radial piercing stars, each flagged critical: 2.80× its unevolved-form damage formula per hit, with 2 pierces. |
 | Infernal Flask | Epic | Throws toward nearest foe within 560; impact creates a 72-radius fire field for 3.8 seconds. Each field tick deals `0.25× projectile damage × (1 + 0.16 × burn stacks)`, applies a slow, and adds burn stacks. Phlogiston Abyss uses radius 105, 12 seconds, and `0.38×` projectile damage per tick, with up to 12 burn stacks. |
 | Chrono Gear | Mythic | Directly hits the nearest foe within 520 and slows it. Damage multiplier roll: 7% chance ×4, next 25% ×0.35, next 38% ×1, remaining 30% ×2.1. Temporal Paradox targets within 700, extends slow, and has a 20% stun chance. |
 | Rusted Dagger | Common | Straight projectile at nearest foe within 500; `0.72× base`, no pierce. Owning it also raises the shared attack cadence by ×1.7. |
@@ -97,13 +97,13 @@ The damage coefficients below multiply the base damage formula in section 1 unle
 | Lightning Rod | Rare | Instantly strikes 3 random foes (plus extra projectiles), each for `1.25× base`. |
 | Solar Discus | Epic | Bouncing disc aimed at a foe within 760; `1.15× base` per hit, with up to 99 arena ricochets and repeat hits after a short cooldown. |
 | Grave Siphon | Epic | Creates a 135-radius black hole at a nearby target; pulls foes inward and deals `0.38× base` per 0.42-second tick for 3.5 seconds. |
-| Grim Reaper's Scythe | Mythic | Sweeps forward within 270; ordinary enemies have a 0.5% chance per attack to be slain instantly, otherwise each hit deals `2.5× base`. Elites cannot be instantly slain. |
-| Armageddon Cannon | Mythic | Every 12 seconds, hits foes within 0.72× the larger viewport dimension; ordinary foes are slain, elites lose 72% of current HP. |
+| Grim Reaper's Scythe | Mythic | Sweeps forward within 270; ordinary enemies have a 0.5% chance per attack to be slain instantly, otherwise each hit deals `1.9× base`. Elites cannot be instantly slain. |
+| Armageddon Cannon | Mythic | Every 16 seconds, hits foes within 0.72× the larger viewport dimension; ordinary foes lose 58% of current HP and elites lose 42%. |
 | Bloody Tear | Legendary | Evolved Whip; see Whip. Hits can restore vitality through its vampiric proc. |
 | Soul Eater | Legendary | Evolved Garlic; see Garlic. |
-| Holy Wand | Legendary | Evolved Magic Wand; homing bolt range 760 and evolved damage multiplier ×2.4. |
-| Heaven Sword | Legendary | Evolved Cross; returning sword behavior, evolved damage multiplier ×2.4. |
-| Unholy Vespers | Legendary | Evolved King Bible; permanent 5-book orbit, faster rotation and expanded orbit. |
+| Holy Wand | Legendary | Evolved Magic Wand; homing bolt range 760 and the ×1.65 evolution damage multiplier. |
+| Heaven Sword | Legendary | Evolved Cross; returning sword behavior and the ×1.65 evolution damage multiplier. |
+| Unholy Vespers | Legendary | Evolved King Bible; permanent 5-book orbit, faster rotation, expanded orbit and ×1.65 orbit damage. |
 | Cages of Torment | Legendary | Evolved Soul Bind Chain; see chain behavior. |
 | Supernova Prism | Legendary | Evolved Starlight Shard; radial piercing-star behavior. |
 | Phlogiston Abyss | Legendary | Evolved Infernal Flask; see fire-field behavior. |
@@ -111,7 +111,7 @@ The damage coefficients below multiply the base damage formula in section 1 unle
 
 ### Evolution pairs
 
-Evolution occurs when a chest is collected while the matching base weapon is level 5 and its paired passive is owned at level 1 or higher. The base weapon is replaced by the evolved weapon, the chest restores vitality to full, and the evolved item retains the weapon level.
+Evolution occurs when a chest is collected while the matching base weapon is level 5 and its paired passive is owned at level 1 or higher. The base weapon is replaced by the evolved weapon, the chest restores 45 vitality, and the evolved item retains the weapon level.
 
 | Base weapon | Required passive | Evolved weapon |
 |---|---|---|
@@ -136,7 +136,7 @@ Passive effects below describe implemented behavior. “Rank” is item level; e
 | Hollow Heart | Common | +10% maximum vitality per effective rank. |
 | Pummarola | Common | Regenerate 0.15 vitality/second per effective rank. |
 | Empty Tome | Common | +8% attack speed per effective rank. |
-| Spinach | Common | +10% weapon damage per effective rank. |
+| Spinach | Common | +7% weapon damage per effective rank. |
 | Wings | Common | +8% movement speed per effective rank. |
 | Clover | Uncommon | Affects luck and gold: +10% gold per effective rank; contributes luck to higher rarity level-up chances. |
 | Spellbinder | Uncommon | Extends selected weapon ranges/durations; adds range to Garlic, chain, and book orbit. |
@@ -147,7 +147,7 @@ Passive effects below describe implemented behavior. “Rank” is item level; e
 | Light Armor | Common | Reduces incoming contact damage by 1 per rank. |
 | Hiking Boots | Common | +5% movement speed per rank. |
 | Minor Potion | Common | One-time pickup: restore 15 vitality; only offered when injured. |
-| Small Gem | Common | +5% weapon damage per effective rank. |
+| Small Gem | Common | +3.5% weapon damage per effective rank. |
 | Tactical Timer | Uncommon | Reduces weapon interval by 8% per rank, to a minimum 35% of the original interval. |
 | Precision Gloves | Uncommon | +10% critical chance per rank. |
 | Magnet Ring | Uncommon | +30% experience-gem collection range per rank. |
@@ -166,7 +166,7 @@ Passive effects below describe implemented behavior. “Rank” is item level; e
 | Phoenix Immortal Heart | Mythic | Once per run, revives at full vitality, grants 5 seconds of invulnerability, and kills ordinary enemies on screen. |
 | Soul Reaper's Covenant | Mythic | Each weapon hit has a 1% chance to instantly slay a non-elite enemy; each kill grants +1 maximum vitality. |
 | Omniscience Eye | Mythic | Forces critical hits; eligible non-sword projectiles ricochet up to 3 times. |
-| Might | Common stat choice | Adds 0.1 to the run's Might stat. |
+| Might | Common stat choice | Adds 0.06 to the run's Might stat. |
 | Magnet | Common stat choice | Adds 0.45 to the run's gem-attraction stat. |
 | Vitality | Common stat choice | Adds 5 maximum vitality and restores 30 vitality. |
 
@@ -176,18 +176,18 @@ Base speeds are world units/second. Contact damage is the raw damage before play
 
 | Monster | Shape | Base HP | Speed | Contact damage | XP | Gold |
 |---|---|---:|---:|---:|---:|---:|
-| Hollow | Circle | 22 | 42 | 8 | 1 | 1 |
-| Imp | Triangle | 16 | 67 | 7 | 1 | 1 |
-| Crypt Knight | Square | 76 | 26 | 15 | 3 | 4 |
-| Wraith | Diamond | 34 | 50 | 10 | 2 | 2 |
-| Mimic | Hexagon | 110 | 29 | 18 | 6 | 10 |
-| Hexer | Hexagon | 52 | 31 | 13 | 3 | 3 |
-| Ravager | Triangle | 64 | 39 | 16 | 4 | 4 |
+| Hollow | Circle | 34 | 42 | 9 | 1 | 1 |
+| Imp | Triangle | 26 | 67 | 8 | 1 | 1 |
+| Crypt Knight | Square | 95 | 26 | 17 | 3 | 4 |
+| Wraith | Diamond | 48 | 50 | 12 | 2 | 2 |
+| Mimic | Hexagon | 145 | 29 | 21 | 6 | 10 |
+| Hexer | Hexagon | 68 | 31 | 15 | 3 | 3 |
+| Ravager | Triangle | 82 | 39 | 18 | 4 | 4 |
 | Red Death | Circle | 100,000 before spawn scaling | 115 before spawn scaling | 9,999 before elite scaling | 50 before elite scaling | 100 before elite scaling |
 
 ### Enemy scaling and special spawns
 
-- Normal enemy HP is `base HP × (1 + elapsed seconds / 480 + (elapsed seconds / 900)²)`. This makes enemy health grow more quickly in the late game: about 2.69× at 10 minutes, 5.28× at 20 minutes, and 8.75× at 30 minutes.
+- Normal enemy HP is `base HP × (1 + elapsed seconds / 400 + (elapsed seconds / 820)²)`. This makes enemy health grow more quickly in the late game: about 3.03× at 10 minutes, 6.14× at 20 minutes, and 10.32× at 30 minutes.
 - Normal movement speed is `base speed × (1 + elapsed seconds / 1800)` (about 1.33× at 10 minutes and 2× at 30 minutes).
 - Enemy contact damage also scales with time: `base damage × (1 + elapsed seconds / 1200)` (1.5× at 10 minutes and 2.5× at 30 minutes).
 - Elite enemies receive a further `+0.6` in the HP multiplier, 1.8× radius, 1.5× contact damage, and 12× XP and gold.
@@ -204,7 +204,7 @@ Base speeds are world units/second. Contact damage is the raw damage before play
 
 - Experience gems are dropped on enemy defeat and pulled toward the player within collection range. Magnet increases attraction; Magnet Ring multiplies pickup range.
 - Enemy gold is paid on defeat. Clover increases the gold payout.
-- Elite enemies drop a treasure chest. Multiple dropped chests are queued rather than replacing one another. If an eligible evolution is available it is evolved; otherwise the chest awards 25 gold (plus Clover bonus) and restores 35 vitality.
+- Elite enemies drop a treasure chest. Multiple dropped chests are queued rather than replacing one another. If an eligible evolution is available it evolves and restores 45 vitality; otherwise the chest awards 25 gold (plus Clover bonus) and restores 35 vitality.
 - Contact damage cooldown is updated once per game frame rather than once per overlapping enemy. After a hit, 0.35 seconds of invulnerability limits contact damage to at most one hit per 0.35 seconds, regardless of how many enemies overlap the player.
 - Standard run duration is 30 minutes. Red Death appears at that time. The run can end earlier if vitality reaches zero and no Phoenix Immortal Heart revive remains.
 - Passive damage-over-time: burn deals `1.4 × burn stacks × current Might` every 0.55 seconds; poison deals `0.8 × poison stacks × current Might` every 0.5 seconds. Venom Master's Seal increases their tick rates.
@@ -212,7 +212,8 @@ Base speeds are world units/second. Contact damage is the raw damage before play
 ## 8. Notes about implementation values
 
 - Weapon base damage is a shared formula, while each weapon applies its own coefficient, target rules, and effect duration. Therefore the table is not a single fixed damage value for every run.
-- Rarity multipliers and the evolution damage multiplier have been tuned down to make damage progression less explosive. Grim Reaper's Scythe damage is reduced to 1.9× base per regular hit; Soul Bind Chain life-steal is 2.5% of damage (5% evolved); Armageddon Cannon fires every 16 seconds and deals 58% of current HP to ordinary foes and 42% to elites rather than instantly defeating them.
+- Player power growth has been reduced: rarity multipliers now range from 1.00× to 1.48×, weapon-level damage rises by 12% per level, Might level-ups add 6%, and the later XP threshold grows by 1.4× plus 4. Enemy base HP and its time-scaling curve have also been raised, so basic enemies take more than one hit to defeat from the start and continue gaining durability later.
+- Weapon rarity and evolution damage have been tuned down to make damage progression less explosive. Grim Reaper's Scythe damage is reduced to 1.9× base per regular hit; Soul Bind Chain life-steal is 2.5% of damage (5% evolved) plus a separate 10% chance per vampiric hit to restore 0.75 vitality; Armageddon Cannon fires every 16 seconds and deals 58% of current HP to ordinary foes and 42% to elites rather than instantly defeating them.
 - Evolved weapons are not ordinary level-up weapon choices; they are produced by chest evolution. Some Legendary wanderers start with an evolved weapon.
 - Item rarity multipliers are applied where the implementation calls `itemPower`/`passivePower`; not every effect uses rarity scaling in the same way.
 - Some rarity-tier weighting and item descriptions are presentation-level systems; gameplay behavior is determined by the implemented rules summarized above.

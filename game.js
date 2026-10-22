@@ -25,7 +25,7 @@
         { id: "aurelia", name: "Aurelia", rarity: "Legendary", weapon: "Holy Wand", icon: "✧", description: "A radiant oracle whose spell never rests.", bonus: "+15% attack speed", stats: { attackSpeed: 1.15 } },
         { id: "draven", name: "Draven", rarity: "Legendary", weapon: "Heaven Sword", icon: "⚔", description: "A fallen champion wielding a blade of judgment.", bonus: "+8% attack speed", stats: { attackSpeed: 1.08 } },
         { id: "seraphine", name: "Seraphine", rarity: "Legendary", weapon: "Soul Eater", icon: "☼", description: "A saint whose endless aura drains the horde.", bonus: "+20 maximum vitality", stats: { maxHp: 120 } },
-        { id: "mortis", name: "Mortis", rarity: "Mythic", weapon: "Grim Reaper's Scythe", icon: "☠", description: "An avatar of endings, sweeping whole ranks aside.", bonus: "+20% weapon might", stats: { might: 1.2 } },
+        { id: "mortis", name: "Mortis", rarity: "Mythic", weapon: "Grim Reaper's Scythe", icon: "☠", description: "An avatar of endings, sweeping whole ranks aside.", bonus: "+12% weapon might", stats: { might: 1.12 } },
         { id: "solara", name: "Solara", rarity: "Mythic", weapon: "Armageddon Cannon", icon: "☄", description: "A star-forged artillery master calling down ruin.", bonus: "+20% maximum vitality", stats: { maxHp: 120 } }
       ];
       const retiredCharacterNames = new Map([
@@ -57,7 +57,7 @@
         "Hollow Heart": { icon: "♡", desc: "Increase maximum vitality by 10% per rank." },
         "Pummarola": { icon: "❀", desc: "Regenerate 0.15 vitality per second per rank." },
         "Empty Tome": { icon: "⌛", desc: "Increase attack speed by 8% per rank." },
-        "Spinach": { icon: "♜", desc: "Increase weapon damage by 10% per rank." },
+        "Spinach": { icon: "♜", desc: "Increase weapon damage by 7% per rank." },
         "Wings": { icon: "➤", desc: "Move 8% faster per rank." },
         "Clover": { icon: "☘", desc: "Increase luck and treasure quality." },
         "Spellbinder": { icon: "⌘", desc: "Extend weapon duration and reach." },
@@ -68,7 +68,7 @@
         "Light Armor": { icon: "▣", desc: "Reduce incoming damage by 1 per hit." },
         "Hiking Boots": { icon: "➤", desc: "Move 5% faster per rank." },
         "Minor Potion": { icon: "🧪", desc: "Instantly restore 15 vitality." },
-        "Small Gem": { icon: "✹", desc: "Increase all weapon damage by 5% per rank." },
+        "Small Gem": { icon: "✹", desc: "Increase all weapon damage by 3.5% per rank." },
         "Tactical Timer": { icon: "◷", desc: "Reduce all weapon cooldowns by 8% per rank." },
         "Precision Gloves": { icon: "✣", desc: "Gain 10% critical chance per rank." },
         "Magnet Ring": { icon: "⊙", desc: "Increase experience gem pickup range by 30% per rank." },
@@ -107,11 +107,11 @@
       };
       const rarityTiers = [
         { name: "Common", className: "white", power: 1, weight: 50 },
-        { name: "Uncommon", className: "green", power: 1.12, weight: 25 },
-        { name: "Rare", className: "blue", power: 1.28, weight: 14 },
-        { name: "Epic", className: "purple", power: 1.5, weight: 8 },
-        { name: "Legendary", className: "yellow", power: 1.8, weight: 3 },
-        { name: "Mythic", className: "red", power: 2.2, weight: .6 }
+        { name: "Uncommon", className: "green", power: 1.06, weight: 25 },
+        { name: "Rare", className: "blue", power: 1.14, weight: 14 },
+        { name: "Epic", className: "purple", power: 1.23, weight: 8 },
+        { name: "Legendary", className: "yellow", power: 1.34, weight: 3 },
+        { name: "Mythic", className: "red", power: 1.48, weight: .6 }
       ];
       const itemRarity = {
         "Magic Wand": "Common", "Whip": "Common", "Garlic": "Common",
@@ -145,18 +145,18 @@
         return rarityForItem(name).power;
       }
       const enemyTypes = [
-        { name: "Hollow", shape: "circle", color: "#8b5b86", hp: 22, speed: 42, radius: 11, damage: 8, xp: 1, gold: 1 },
-        { name: "Imp", shape: "triangle", color: "#d26751", hp: 16, speed: 67, radius: 9, damage: 7, xp: 1, gold: 1 },
-        { name: "Crypt Knight", shape: "square", color: "#87909c", hp: 76, speed: 26, radius: 15, damage: 15, xp: 3, gold: 4 },
-        { name: "Wraith", shape: "diamond", color: "#58b8c2", hp: 34, speed: 50, radius: 11, damage: 10, xp: 2, gold: 2 },
-        { name: "Mimic", shape: "hex", color: "#c49b49", hp: 110, speed: 29, radius: 17, damage: 18, xp: 6, gold: 10 },
-        { name: "Hexer", shape: "hex", color: "#a76ddd", hp: 52, speed: 31, radius: 13, damage: 13, xp: 3, gold: 3, behavior: "caster" },
-        { name: "Ravager", shape: "triangle", color: "#e05c47", hp: 64, speed: 39, radius: 14, damage: 16, xp: 4, gold: 4, behavior: "charger" }
+        { name: "Hollow", shape: "circle", color: "#8b5b86", hp: 34, speed: 42, radius: 11, damage: 9, xp: 1, gold: 1 },
+        { name: "Imp", shape: "triangle", color: "#d26751", hp: 26, speed: 67, radius: 9, damage: 8, xp: 1, gold: 1 },
+        { name: "Crypt Knight", shape: "square", color: "#87909c", hp: 95, speed: 26, radius: 15, damage: 17, xp: 3, gold: 4 },
+        { name: "Wraith", shape: "diamond", color: "#58b8c2", hp: 48, speed: 50, radius: 11, damage: 12, xp: 2, gold: 2 },
+        { name: "Mimic", shape: "hex", color: "#c49b49", hp: 145, speed: 29, radius: 17, damage: 21, xp: 6, gold: 10 },
+        { name: "Hexer", shape: "hex", color: "#a76ddd", hp: 68, speed: 31, radius: 13, damage: 15, xp: 3, gold: 3, behavior: "caster" },
+        { name: "Ravager", shape: "triangle", color: "#e05c47", hp: 82, speed: 39, radius: 14, damage: 18, xp: 4, gold: 4, behavior: "charger" }
       ];
       const upgradePool = [
         ...Object.keys(weaponData).map((name) => ({ type: "weapon", name, ...weaponData[name] })),
         ...Object.keys(passiveData).map((name) => ({ type: "passive", name, ...passiveData[name] })),
-        { type: "stat", name: "Might", icon: "✹", desc: "Increase all weapon damage by 10%." },
+        { type: "stat", name: "Might", icon: "✹", desc: "Increase all weapon damage by 6%." },
         { type: "stat", name: "Magnet", icon: "⊙", desc: "Draw experience gems from farther away." },
         { type: "stat", name: "Vitality", icon: "♥", desc: "Restore 30 vitality and increase max vitality by 5." }
       ];
@@ -268,7 +268,7 @@
         const cost = 20 + state.shopLevel * 25;
         $("shop").innerHTML = `
           <div class="shop-row">
-            <div><strong>Manor training · +5% weapon might</strong><small>Permanent bonus · Rank ${state.shopLevel}</small></div>
+            <div><strong>Manor training · +3% weapon might</strong><small>Permanent bonus · Rank ${state.shopLevel}</small></div>
             <button class="shop-button" id="buy-upgrade" ${state.totalGold < cost || state.shopLevel >= 10 ? "disabled" : ""}>${state.shopLevel >= 10 ? "MAX RANK" : "Buy · " + cost + " gold"}</button>
           </div>`;
         $("buy-upgrade").addEventListener("click", () => {
@@ -325,7 +325,7 @@
         state.xp = 0;
         state.xpNext = 8;
         state.rerolls = 0;
-        state.might = (character.stats.might || 1) + state.shopLevel * .05;
+        state.might = (character.stats.might || 1) + state.shopLevel * .03;
         state.magnet = 1;
         state.passiveTimers = {};
         state.totalGoldEarned = 0;
@@ -360,7 +360,7 @@
       }
       function addEnemy(x, y, type, elite) {
         const elapsed = state.time;
-        const scale = 1 + elapsed / 480 + (elapsed / 900) ** 2 + (elite ? .6 : 0);
+        const scale = 1 + elapsed / 400 + (elapsed / 820) ** 2 + (elite ? .6 : 0);
         state.enemies.push({
           id: state.nextEnemyId++, x, y, type, hp: type.hp * scale, maxHp: type.hp * scale,
           speed: type.speed * (1 + elapsed / 1800), radius: type.radius * (elite ? 1.8 : 1),
@@ -419,8 +419,8 @@
           Math.abs(enemy.y - state.player.y) <= GAME_HEIGHT / 2 + radius;
       }
       function currentMight() {
-        return state.might * (1 + passivePower("Spinach") * .1) *
-          (1 + passivePower("Small Gem") * .05) *
+        return state.might * (1 + passivePower("Spinach") * .07) *
+          (1 + passivePower("Small Gem") * .035) *
           (state.passives["Dragon Heart"] ? 1.5 : 1) *
           (1 + (state.midasDamageBonus || 0));
       }
@@ -438,7 +438,7 @@
       function fireWeaponSingle(name, evolved, weaponLevel) {
         const level = weaponLevel || state.inventory[name] || 1;
         const damageItemName = evolved && weaponData[name].evolution ? weaponData[name].evolution : name;
-        const baseDamage = (name === "Magic Wand" ? 19 : name === "Cross" ? 28 : 22) * currentMight() * itemPower(damageItemName) * (1 + level * .16) * (evolved ? 2 : 1);
+        const baseDamage = (name === "Magic Wand" ? 19 : name === "Cross" ? 28 : 22) * currentMight() * itemPower(damageItemName) * (1 + level * .12) * (evolved ? 1.65 : 1);
         if (name === "Magic Wand") {
           const target = nearestEnemy((evolved ? 760 : 550) + passivePower("Optic Lens") * 60);
           if (!target) return;
@@ -653,9 +653,9 @@
           state.hitTexts.push({ x: enemy.x, y: enemy.y - enemy.radius, text: executed ? "SLAIN!" : critical ? `CRIT ${Math.round(amount)}` : Math.round(amount).toString(), life: .58, maxLife: .58, color: executed ? "#ff7182" : critical ? "#fff17a" : "#fff2d2" });
           enemy.damageTextCooldown = .14;
         }
-        if ((vampiric && Math.random() < .24) ||
+        if ((vampiric && Math.random() < .1) ||
           (state.passives["Vampiric Gem"] && Math.random() < .03 * state.passives["Vampiric Gem"])) {
-          state.player.hp = Math.min(state.player.maxHp, state.player.hp + 1);
+          state.player.hp = Math.min(state.player.maxHp, state.player.hp + .75);
         }
         if (critical && state.passives["Eye of Cataclysm"] && !suppressSpecials) {
           const blastRadius = 78 * (1 + passivePower("Tome of Area") * .15);
@@ -725,7 +725,7 @@
         while (state.xp >= state.xpNext) {
           state.xp -= state.xpNext;
           state.level++;
-          state.xpNext = Math.ceil(state.xpNext * 1.32 + 3);
+          state.xpNext = Math.ceil(state.xpNext * 1.4 + 4);
           openLevelUp();
           break;
         }
@@ -799,7 +799,7 @@
         if (state.xp >= state.xpNext) {
           state.xp -= state.xpNext;
           state.level++;
-          state.xpNext = Math.ceil(state.xpNext * 1.32 + 3);
+          state.xpNext = Math.ceil(state.xpNext * 1.4 + 4);
           openLevelUp();
         }
       }
@@ -820,7 +820,7 @@
           state.passives[item.name]++;
           syncPassiveStats();
         }
-        else if (item.name === "Might") state.might += .1;
+        else if (item.name === "Might") state.might += .06;
         else if (item.name === "Magnet") state.magnet += .45;
         else if (item.name === "Vitality") {
           state.player.bonusMaxHp += 5;
@@ -841,8 +841,8 @@
           delete state.inventory[evo.weapon];
           state.inventory[name] = evolvedLevel;
           state.chest.opened = true;
-          state.player.hp = state.player.maxHp;
-          toast(name + " evolved! Full vitality restored.");
+          state.player.hp = Math.min(state.player.maxHp, state.player.hp + 45);
+          toast(name + " evolved! Restored 45 vitality.");
           burst(chestX, chestY, "#ffe3a0", 24);
           updateHud();
         } else {
@@ -1043,7 +1043,7 @@
             if (baseName === "King Bible") {
               if (!state.projectiles.some((projectile) => projectile.orbit && projectile.weapon === name)) {
                 const count = (evolved ? 5 : 2 + Math.floor(level / 3)) + extraProjectileCount();
-                for (let i = 0; i < count; i++) state.projectiles.push({ orbit: true, weapon: name, angle: i / count * Math.PI * 2, radius: 7, damage: 10 * currentMight() * (evolved ? 2 : 1), color: evolved ? "#f3d98b" : "#b29bda", life: Infinity });
+                for (let i = 0; i < count; i++) state.projectiles.push({ orbit: true, weapon: name, angle: i / count * Math.PI * 2, radius: 7, damage: 10 * currentMight() * (evolved ? 1.65 : 1), color: evolved ? "#f3d98b" : "#b29bda", life: Infinity });
               }
             } else if (baseName === "Spiked Rotor") {
               if (!state.projectiles.some((projectile) => projectile.orbit && projectile.weapon === name)) fireWeapon(baseName, evolved, level);
