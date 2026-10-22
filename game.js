@@ -149,7 +149,9 @@
         { name: "Imp", shape: "triangle", color: "#d26751", hp: 16, speed: 67, radius: 9, damage: 7, xp: 1, gold: 1 },
         { name: "Crypt Knight", shape: "square", color: "#87909c", hp: 76, speed: 26, radius: 15, damage: 15, xp: 3, gold: 4 },
         { name: "Wraith", shape: "diamond", color: "#58b8c2", hp: 34, speed: 50, radius: 11, damage: 10, xp: 2, gold: 2 },
-        { name: "Mimic", shape: "hex", color: "#c49b49", hp: 110, speed: 29, radius: 17, damage: 18, xp: 6, gold: 10 }
+        { name: "Mimic", shape: "hex", color: "#c49b49", hp: 110, speed: 29, radius: 17, damage: 18, xp: 6, gold: 10 },
+        { name: "Hexer", shape: "hex", color: "#a76ddd", hp: 52, speed: 31, radius: 13, damage: 13, xp: 3, gold: 3, behavior: "caster" },
+        { name: "Ravager", shape: "triangle", color: "#e05c47", hp: 64, speed: 39, radius: 14, damage: 16, xp: 4, gold: 4, behavior: "charger" }
       ];
       const upgradePool = [
         ...Object.keys(weaponData).map((name) => ({ type: "weapon", name, ...weaponData[name] })),
@@ -159,7 +161,7 @@
         { type: "stat", name: "Vitality", icon: "♥", desc: "Restore 30 vitality and increase max vitality by 5." }
       ];
       const state = {
-        mode: "menu", selected: "arcanist", player: null, enemies: [], projectiles: [], gems: [], particles: [], slashes: [], hazards: [], hitTexts: [],
+        mode: "menu", selected: "arcanist", player: null, enemies: [], projectiles: [], gems: [], particles: [], slashes: [], hazards: [], enemyAttacks: [], hitTexts: [],
         time: 0, kills: 0, gold: 0, totalGold: 0, level: 1, xp: 0, xpNext: 8, rerolls: 0,
         inventory: {}, passives: {}, might: 1, magnet: 1, moveSpeed: 180,
         spawnTimer: 0, attackTimer: 0, damageTimer: 0, guardianSpawned: false, bossDefeated: false, redDeathSpawned: false,
@@ -314,6 +316,7 @@
         state.particles = [];
         state.slashes = [];
         state.hazards = [];
+        state.enemyAttacks = [];
         state.hitTexts = [];
         state.time = 0;
         state.kills = 0;
@@ -363,6 +366,7 @@
           speed: type.speed * (1 + elapsed / 1800), radius: type.radius * (elite ? 1.8 : 1),
           damage: type.damage * (1 + elapsed / 1200) * (elite ? 1.5 : 1), xp: type.xp * (elite ? 12 : 1),
           gold: type.gold * (elite ? 12 : 1), elite: !!elite, hitFlash: 0,
+          attackCooldown: 2 + Math.random() * 2, chargeWindup: 0, chargeTime: 0, chargeDx: 0, chargeDy: 0,
           slowTimer: 0, stunTimer: 0,           burnTimer: 0, burnStacks: 0, burnTick: 0, poisonTimer: 0, poisonStacks: 0, poisonTick: 0
         });
       }
@@ -370,8 +374,10 @@
         const angle = Math.random() * Math.PI * 2;
         const distance = Math.max(GAME_WIDTH, GAME_HEIGHT) * .62 + 50;
         const roll = Math.random();
-        let index = roll < .52 ? 0 : roll < .75 ? 1 : roll < .89 ? 2 : 3;
+        let index = roll < .47 ? 0 : roll < .69 ? 1 : roll < .82 ? 2 : 3;
         if (state.time > 150 && roll > .94) index = 4;
+        if (state.time >= 240 && roll > .84 && roll <= .94) index = 5;
+        if (state.time >= 360 && roll > .78 && roll <= .84) index = 6;
         const type = enemyTypes[index];
         addEnemy(state.player.x + Math.cos(angle) * distance, state.player.y + Math.sin(angle) * distance, type, false);
       }
@@ -379,11 +385,12 @@
         state.wave++;
         state.nextWaveAt += 120;
         state.waveEndAt = state.time + 24;
-        const count = Math.max(0, Math.min(180 - state.enemies.length, 26, 12 + state.wave * 2));
+        const count = Math.max(0, Math.min(180 - state.enemies.length, 42, 16 + state.wave * 3));
         const distance = Math.max(GAME_WIDTH, GAME_HEIGHT) * .57 + 90;
         for (let i = 0; i < count; i++) {
           const angle = i / count * Math.PI * 2 + (Math.random() - .5) * .28;
-          const type = enemyTypes[i % 5 === 4 ? 2 : i % 4];
+          const availableTypes = state.time >= 360 ? 7 : state.time >= 240 ? 6 : 5;
+          const type = enemyTypes[(i * 3 + state.wave) % availableTypes];
           addEnemy(state.player.x + Math.cos(angle) * distance, state.player.y + Math.sin(angle) * distance, type, false);
         }
         if (state.enemies.length < 180) {
@@ -473,7 +480,7 @@
               drained += hit;
             }
           }
-          state.player.hp = Math.min(state.player.maxHp, state.player.hp + drained * (evolved ? .09 : .045));
+          state.player.hp = Math.min(state.player.maxHp, state.player.hp + drained * (evolved ? .05 : .025));
           state.slashes.push({ x: state.player.x, y: state.player.y, life: .3, maxLife: .3, radius: range, kind: "chain", evolved });
         } else if (name === "Starlight Shard") {
           if (evolved) {
@@ -575,17 +582,17 @@
             const dy = enemy.y - state.player.y;
             if (Math.hypot(dx, dy) <= range && dx * direction >= -enemy.radius) {
               if (!enemy.elite && Math.random() < .005) damageEnemy(enemy, enemy.hp, false, false, false, true);
-              else damageEnemy(enemy, baseDamage * 2.5);
+              else damageEnemy(enemy, baseDamage * 1.9);
             }
           }
           state.slashes.push({ kind: "scythe", x: state.player.x, y: state.player.y, direction, radius: range, life: .42, maxLife: .42 });
         } else if (name === "Armageddon Cannon") {
           if (state.time < (state.weaponCooldowns[name] || 0)) return;
-          state.weaponCooldowns[name] = state.time + 12;
+          state.weaponCooldowns[name] = state.time + 16;
           const radius = Math.hypot(GAME_WIDTH / 2, GAME_HEIGHT / 2);
           for (const enemy of [...state.enemies]) {
             if (isEnemyOnScreen(enemy) && Math.hypot(enemy.x - state.player.x, enemy.y - state.player.y) < radius) {
-              damageEnemy(enemy, enemy.elite ? enemy.hp * .72 : enemy.hp);
+              damageEnemy(enemy, enemy.hp * (enemy.elite ? .42 : .58));
             }
           }
           state.hazards.push({ kind: "meteor", x: state.player.x, y: state.player.y, radius, damage: 0, life: .8, tick: 1 });
@@ -913,6 +920,42 @@
         state.history = state.history.slice(0, 20);
         save();
       }
+      function hurtPlayer(rawDamage) {
+        const p = state.player;
+        if (state.damageTimer > 0 || p.invulnerable > 0) return;
+        const armor = (state.passives["Light Armor"] || 0) + (state.passives["Spike Mail"] || 0) * 3;
+        const incomingDamage = Math.max(1, rawDamage - armor) * Math.max(.45, 1 - passivePower("Iron Plate") * .07);
+        if (state.passives["Aegis Barrier"] && (state.passiveTimers.aegis || 0) <= 0) {
+          state.passiveTimers.aegis = 15;
+          burst(p.x, p.y, "#c18aff", 16);
+        } else {
+          p.hp -= incomingDamage;
+          if (state.passives["Spike Mail"]) {
+            for (const nearby of [...state.enemies]) {
+              if (Math.hypot(nearby.x - p.x, nearby.y - p.y) < 105) damageEnemy(nearby, incomingDamage, false, false, true);
+            }
+          }
+        }
+        if (state.passives["Chronos Charm"] && p.hp / p.maxHp < .3 && (state.passiveTimers.chronos || 0) <= 0) {
+          state.passiveTimers.chronos = 60;
+          for (const foe of state.enemies) foe.stunTimer = Math.max(foe.stunTimer || 0, 3);
+          burst(p.x, p.y, "#c18aff", 24);
+        }
+        p.invulnerable = .35;
+        state.damageTimer = .3;
+        burst(p.x, p.y, "#ef645f", 5);
+        if (p.hp <= 0 && state.passives["Phoenix Immortal Heart"] && !state.revived) {
+          state.revived = true;
+          p.hp = p.maxHp;
+          p.invulnerable = 5;
+          for (const foe of [...state.enemies]) if (!foe.elite) killEnemy(foe);
+          burst(p.x, p.y, "#ffab5e", 50);
+        } else if (p.hp <= 0) {
+          p.hp = 0;
+          updateHud();
+          endRun(false);
+        }
+      }
       function update(dt) {
         if (state.mode !== "running") return;
         const p = state.player;
@@ -982,11 +1025,11 @@
         }
 
         state.spawnTimer -= dt;
-        const spawnRate = Math.max(.14, .62 - state.time / 5000) * (state.time < state.waveEndAt ? .55 : 1);
+        const spawnRate = Math.max(.22, .58 - state.time / 4200) * (state.time < state.waveEndAt ? 1.15 : 1);
         if (state.spawnTimer <= 0) {
           if (state.enemies.length < 180) {
             spawnEnemy();
-            if (state.enemies.length < 180 && state.time > 90 && Math.random() < Math.min(.65, state.time / 600)) spawnEnemy();
+            if (state.enemies.length < 180 && state.time > 90 && Math.random() < Math.min(.65, state.time / 900)) spawnEnemy();
           }
           state.spawnTimer = spawnRate;
         }
@@ -1142,6 +1185,14 @@
           }
         }
         state.hazards = state.hazards.filter((hazard) => hazard.life > 0);
+        for (const attack of [...state.enemyAttacks]) {
+          attack.life -= dt;
+          if (attack.life <= 0) {
+            if (Math.hypot(p.x - attack.x, p.y - attack.y) < attack.radius + p.radius) hurtPlayer(attack.damage);
+            state.enemyAttacks.splice(state.enemyAttacks.indexOf(attack), 1);
+            if (state.mode !== "running") return;
+          }
+        }
         for (const enemy of [...state.enemies]) {
           enemy.slowTimer = Math.max(0, (enemy.slowTimer || 0) - dt);
           enemy.stunTimer = Math.max(0, (enemy.stunTimer || 0) - dt);
@@ -1159,45 +1210,42 @@
           }
           if (enemy.hp <= 0) continue;
           const angle = Math.atan2(p.y - enemy.y, p.x - enemy.x);
-          const movementScale = enemy.stunTimer > 0 ? 0 : enemy.slowTimer > 0 ? .42 : 1;
-          const stepX = Math.cos(angle) * enemy.speed * movementScale * dt;
-          const stepY = Math.sin(angle) * enemy.speed * movementScale * dt;
+          const distanceToPlayer = Math.hypot(p.x - enemy.x, p.y - enemy.y);
+          if (enemy.stunTimer <= 0 && enemy.type.behavior === "caster") {
+            enemy.attackCooldown -= dt;
+            if (enemy.attackCooldown <= 0 && distanceToPlayer < 620 && distanceToPlayer > 115 && isEnemyOnScreen(enemy)) {
+              enemy.attackCooldown = 3.2 + Math.random() * .8;
+              state.enemyAttacks.push({ x: p.x, y: p.y, radius: 62, life: .95, maxLife: .95, damage: enemy.damage * 1.2 });
+            }
+          } else if (enemy.stunTimer <= 0 && enemy.type.behavior === "charger") {
+            if (enemy.chargeWindup > 0) {
+              enemy.chargeWindup = Math.max(0, enemy.chargeWindup - dt);
+              if (!enemy.chargeWindup) enemy.chargeTime = .42;
+            } else if (enemy.chargeTime > 0) {
+              enemy.chargeTime = Math.max(0, enemy.chargeTime - dt);
+            } else {
+              enemy.attackCooldown -= dt;
+              if (enemy.attackCooldown <= 0 && distanceToPlayer < 430 && isEnemyOnScreen(enemy)) {
+                enemy.attackCooldown = 3.8;
+                enemy.chargeWindup = .72;
+                enemy.chargeDx = Math.cos(angle);
+                enemy.chargeDy = Math.sin(angle);
+              }
+            }
+          }
+          const movementScale = enemy.stunTimer > 0 || enemy.chargeWindup > 0 ? 0 : enemy.slowTimer > 0 ? .42 : 1;
+          const movingX = enemy.chargeTime > 0 ? enemy.chargeDx * enemy.speed * 3.8 : Math.cos(angle) * enemy.speed * movementScale;
+          const movingY = enemy.chargeTime > 0 ? enemy.chargeDy * enemy.speed * 3.8 : Math.sin(angle) * enemy.speed * movementScale;
+          const stepX = movingX * dt;
+          const stepY = movingY * dt;
           if (!collidesWithTerrain(enemy.x + stepX, enemy.y, enemy.radius)) enemy.x += stepX;
           else if (!collidesWithTerrain(enemy.x + Math.cos(angle + .8) * enemy.speed * dt, enemy.y, enemy.radius)) enemy.x += Math.cos(angle + .8) * enemy.speed * dt;
           if (!collidesWithTerrain(enemy.x, enemy.y + stepY, enemy.radius)) enemy.y += stepY;
           else if (!collidesWithTerrain(enemy.x, enemy.y + Math.sin(angle - .8) * enemy.speed * dt, enemy.radius)) enemy.y += Math.sin(angle - .8) * enemy.speed * dt;
           enemy.hitFlash = Math.max(0, enemy.hitFlash - dt);
           if (Math.hypot(enemy.x - p.x, enemy.y - p.y) < enemy.radius + p.radius) {
-            if (state.damageTimer <= 0 && p.invulnerable <= 0) {
-              const armor = (state.passives["Light Armor"] || 0) + (state.passives["Spike Mail"] || 0) * 3;
-              const incomingDamage = Math.max(1, enemy.damage - armor) * Math.max(.45, 1 - passivePower("Iron Plate") * .07);
-              if (state.passives["Aegis Barrier"] && (state.passiveTimers.aegis || 0) <= 0) {
-                state.passiveTimers.aegis = 15;
-                burst(p.x, p.y, "#c18aff", 16);
-              } else {
-                p.hp -= incomingDamage;
-                if (state.passives["Spike Mail"]) {
-                  for (const nearby of [...state.enemies]) {
-                    if (Math.hypot(nearby.x - p.x, nearby.y - p.y) < 105) damageEnemy(nearby, incomingDamage, false, false, true);
-                  }
-                }
-              }
-              if (state.passives["Chronos Charm"] && p.hp / p.maxHp < .3 && (state.passiveTimers.chronos || 0) <= 0) {
-                state.passiveTimers.chronos = 60;
-                for (const foe of state.enemies) foe.stunTimer = Math.max(foe.stunTimer || 0, 3);
-                burst(p.x, p.y, "#c18aff", 24);
-              }
-              p.invulnerable = .35;
-              state.damageTimer = .3;
-              burst(p.x, p.y, "#ef645f", 5);
-              if (p.hp <= 0 && state.passives["Phoenix Immortal Heart"] && !state.revived) {
-                state.revived = true;
-                p.hp = p.maxHp;
-                p.invulnerable = 5;
-                for (const foe of [...state.enemies]) if (!foe.elite) killEnemy(foe);
-                burst(p.x, p.y, "#ffab5e", 50);
-              } else if (p.hp <= 0) { p.hp = 0; updateHud(); endRun(false); return; }
-            }
+            hurtPlayer(enemy.damage);
+            if (state.mode !== "running") return;
           }
         }
         for (const gem of [...state.gems]) {
@@ -1502,6 +1550,14 @@
         const y = enemy.y - camY;
         ctx.save();
         ctx.translate(x, y);
+        if (enemy.chargeWindup > 0) {
+          ctx.strokeStyle = `rgba(255,75,64,${.45 + Math.sin(state.time * 24) * .25})`;
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(enemy.chargeDx * 260, enemy.chargeDy * 260);
+          ctx.stroke();
+        }
         ctx.fillStyle = enemy.hitFlash ? "#fff4ce" : enemy.type.color;
         ctx.strokeStyle = enemy.elite ? "#ffdc85" : "rgba(15,9,17,.8)";
         ctx.lineWidth = enemy.elite ? 3 : 2;
@@ -1745,6 +1801,18 @@
             fire.addColorStop(0, colors[0]); fire.addColorStop(.45, colors[1]); fire.addColorStop(1, colors[2]);
             ctx.fillStyle = fire; ctx.beginPath(); ctx.arc(x, y, hazard.radius * flicker, 0, Math.PI * 2); ctx.fill();
           }
+          ctx.restore();
+        }
+        for (const attack of state.enemyAttacks) {
+          const x = attack.x - camX, y = attack.y - camY;
+          const progress = 1 - attack.life / attack.maxLife;
+          ctx.save();
+          ctx.globalAlpha = .25 + progress * .55;
+          ctx.fillStyle = "rgba(223,77,105,.32)";
+          ctx.strokeStyle = "#ff6b80";
+          ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.arc(x, y, attack.radius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.beginPath(); ctx.arc(x, y, attack.radius * Math.max(.08, 1 - progress), 0, Math.PI * 2); ctx.stroke();
           ctx.restore();
         }
         if (state.chest && !state.chest.opened) {

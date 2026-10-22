@@ -181,6 +181,8 @@ Base speeds are world units/second. Contact damage is the raw damage before play
 | Crypt Knight | Square | 76 | 26 | 15 | 3 | 4 |
 | Wraith | Diamond | 34 | 50 | 10 | 2 | 2 |
 | Mimic | Hexagon | 110 | 29 | 18 | 6 | 10 |
+| Hexer | Hexagon | 52 | 31 | 13 | 3 | 3 |
+| Ravager | Triangle | 64 | 39 | 16 | 4 | 4 |
 | Red Death | Circle | 100,000 before spawn scaling | 115 before spawn scaling | 9,999 before elite scaling | 50 before elite scaling | 100 before elite scaling |
 
 ### Enemy scaling and special spawns
@@ -190,9 +192,12 @@ Base speeds are world units/second. Contact damage is the raw damage before play
 - Enemy contact damage also scales with time: `base damage × (1 + elapsed seconds / 1200)` (1.5× at 10 minutes and 2.5× at 30 minutes).
 - Elite enemies receive a further `+0.6` in the HP multiplier, 1.8× radius, 1.5× contact damage, and 12× XP and gold.
 - At 10:00, an elite Mimic guardian spawns with 4× the already-scaled elite HP. Defeating an elite creates a treasure chest.
-- A wave begins every 2 minutes. It includes up to `min(26, 12 + 2 × wave number)` regular enemies and one elite Mimic captain, without exceeding the 180-enemy field limit. If there is only room for regular wave enemies, the captain is skipped. The captain has an extra HP multiplier of `1.4 + 0.15 × wave number`. The wave has an increased spawn rate for 24 seconds.
+- A wave begins every 2 minutes. It includes up to `min(42, 16 + 3 × wave number)` regular enemies and one elite Mimic captain, without exceeding the 180-enemy field limit. If there is only room for regular wave enemies, the captain is skipped. The captain has an extra HP multiplier of `1.4 + 0.15 × wave number`. The wave also increases regular spawn frequency for 24 seconds.
+- Regular spawn frequency increases over time, with a minimum interval of 0.22 seconds; after 1:30, each spawn has an increasing chance of producing a second enemy (capped at 65%). The 180-enemy field limit remains in effect.
+- Hexers begin appearing after 4:00. They stop at range and mark the player's current location with a visible danger circle; after 0.95 seconds, the area deals 1.2× their scaled contact damage. Ravagers appear after 6:00; they telegraph a straight charge for 0.72 seconds, then rush along the indicated direction.
 - At 30:00, Red Death spawns as an elite. Applying the elapsed-time/elite scaling to its base values gives approximately 935,000 HP, 230 speed, 37,500 contact damage, 600 XP, and 1,200 gold at that moment.
 - Standard contact hits are reduced by Light Armor, Spike Mail armor, and Iron Plate; at least 1 damage is taken when the hit is not blocked by Aegis.
+- Contact and telegraphed enemy attacks share the same armor, Aegis, invulnerability, and revival rules.
 - Slow makes enemies move at 42% speed; stun stops movement.
 
 ## 7. Environment, pickups, and run end
@@ -207,7 +212,7 @@ Base speeds are world units/second. Contact damage is the raw damage before play
 ## 8. Notes about implementation values
 
 - Weapon base damage is a shared formula, while each weapon applies its own coefficient, target rules, and effect duration. Therefore the table is not a single fixed damage value for every run.
-- Rarity multipliers and the evolution damage multiplier have been tuned down to make damage progression less explosive; elite enemies now gain contact damage over time, and enemy HP gains an additional late-run curve.
+- Rarity multipliers and the evolution damage multiplier have been tuned down to make damage progression less explosive. Grim Reaper's Scythe damage is reduced to 1.9× base per regular hit; Soul Bind Chain life-steal is 2.5% of damage (5% evolved); Armageddon Cannon fires every 16 seconds and deals 58% of current HP to ordinary foes and 42% to elites rather than instantly defeating them.
 - Evolved weapons are not ordinary level-up weapon choices; they are produced by chest evolution. Some Legendary wanderers start with an evolved weapon.
 - Item rarity multipliers are applied where the implementation calls `itemPower`/`passivePower`; not every effect uses rarity scaling in the same way.
 - Some rarity-tier weighting and item descriptions are presentation-level systems; gameplay behavior is determined by the implemented rules summarized above.
