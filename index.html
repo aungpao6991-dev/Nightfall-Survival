@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#100e16">
+  <title>Nightfall Survivors</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="game">
+    <canvas id="arena" tabindex="0" aria-label="Nightfall Survivors game arena"></canvas>
+    <div class="vignette"></div>
+    <header id="hud" class="hud hidden">
+      <div class="hud-row">
+        <div>
+          <div class="brand-mini">NIGHTFALL SURVIVORS</div>
+          <div class="stage-name" id="active-character-label">The Arcanist</div>
+          <div class="health-wrap">
+            <div class="bar-caption"><span>Vitality</span><span id="health-label">100 / 100</span></div>
+            <div class="bar"><i id="health-fill"></i></div>
+          </div>
+        </div>
+        <div class="xp-wrap">
+          <div class="bar"><i id="xp-fill"></i></div>
+          <div class="bar-caption"><span>Level <b id="level-label">1</b></span><span id="xp-label">0 / 8 XP</span></div>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="stat-label">Time</div><div class="stat-value" id="time-label">00:00</div></div>
+          <div class="stat"><div class="stat-label">Wave</div><div class="stat-value" id="wave-label">—</div></div>
+          <div class="stat"><div class="stat-label">Slain</div><div class="stat-value" id="kills-label">0</div></div>
+          <div class="stat"><div class="stat-label">Gold</div><div class="stat-value" id="gold-label">0</div></div>
+          <button id="pause-button" class="pause-button" aria-label="Pause game">Ⅱ</button>
+        </div>
+      </div>
+    </header>
+    <div id="hud-bottom" class="hud-bottom hidden">
+      <div class="pause-hint"><span class="key">WASD</span> Move &nbsp; <span class="key">Space</span> Dash &nbsp; <span class="key">Esc</span> Pause</div>
+    </div>
+    <div id="toast" class="toast"></div>
+    <section id="menu-overlay" class="overlay">
+      <div class="panel">
+        <div id="mode-screen">
+          <div class="eyebrow">A gothic survival roguelite</div>
+          <h1>NIGHTFALL<br><span>SURVIVORS</span></h1>
+          <p class="intro">The night is hungry. Choose a mode, face the endless tide, and find a way to survive.</p>
+          <div class="eyebrow menu-select-label">Choose a stage mode</div>
+          <div class="mode-grid">
+            <button class="mode-card available" id="solo-mode-button">
+              <span class="mode-status">Available</span><strong>Standard Mode</strong>
+              <small>Survive the Hollow Grounds. Build your arsenal and face the Red Death at 30 minutes.</small>
+              <span class="mode-enter">Choose Wanderer →</span>
+            </button>
+            <div class="mode-card locked"><span class="mode-status">Locked</span><strong>Hyper Mode</strong><small>Faster movement and monsters, with increased Gold and Luck.</small></div>
+            <div class="mode-card locked"><span class="mode-status">Locked</span><strong>Hurry Mode</strong><small>The clock runs twice as fast. Survive a 15-minute run.</small></div>
+            <div class="mode-card locked"><span class="mode-status">Locked</span><strong>Endless Mode</strong><small>The Reaper stays away. Enemy waves grow stronger without end.</small></div>
+            <div class="mode-card locked"><span class="mode-status">Locked</span><strong>Inverse Mode</strong><small>A reversed arena with stronger enemies and greater Gold rewards.</small></div>
+            <div class="mode-card locked"><span class="mode-status">Locked</span><strong>Co-op Mode</strong><small>Local couch co-op for up to four players.</small></div>
+            <div class="mode-card locked"><span class="mode-status">Locked</span><strong>Adventures Mode</strong><small>Story campaigns with unique shops and missions.</small></div>
+          </div>
+          <div class="action-row">
+            <div class="record">Lifetime gold: <span id="lifetime-gold" class="gold-total">0</span></div>
+            <button id="history-button" class="secondary">Run history</button>
+          </div>
+          <div class="controls"><span class="key">W</span> <span class="key">A</span> <span class="key">S</span> <span class="key">D</span> / Arrow keys to move &nbsp; · &nbsp; <span class="key">Space</span> Dash &nbsp; · &nbsp; Weapons attack automatically</div>
+        </div>
+        <div id="character-screen" class="hidden">
+          <div class="eyebrow">Standard Mode · The Hollow Grounds</div>
+          <h2>Choose your wanderer</h2>
+          <p class="intro">Select a character to review your choice before beginning the run.</p>
+          <div class="character-grid" id="character-grid"></div>
+          <div class="action-row">
+            <button id="back-to-modes" class="secondary">← Back to modes</button>
+            <div class="record">Lifetime gold: <span id="lifetime-gold-characters" class="gold-total">0</span></div>
+          </div>
+          <div id="shop"></div>
+        </div>
+      </div>
+      <div id="character-confirm" class="confirm-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-character-title">
+        <div class="confirm-card">
+          <div class="eyebrow">A new journey begins</div>
+          <h2 id="confirm-character-title">Ready to enter the night?</h2>
+          <p id="confirm-character-message" class="intro centered-intro"></p>
+          <div class="action-row confirm-actions"><button id="cancel-character" class="secondary">Choose another</button><button id="confirm-character" class="primary">Begin run</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="level-overlay" class="overlay hidden">
+      <div class="panel">
+        <div class="choices-title"><div class="eyebrow">Power surges through you</div><h2>Choose an upgrade</h2><div class="record">Select a boon to continue your run</div><div class="rarity-legend"><span class="rarity-white">White · Common</span><span class="rarity-green">Green · Uncommon</span><span class="rarity-blue">Blue · Rare</span><span class="rarity-purple">Purple · Epic</span><span class="rarity-yellow">Yellow · Legendary</span><span class="rarity-red">Red · Mythic</span></div></div>
+        <div id="choices" class="choice-grid"></div>
+      </div>
+    </section>
+
+    <section id="history-overlay" class="overlay hidden">
+      <div class="panel narrow">
+        <div class="eyebrow">Your journey through the night</div>
+        <h2>Run history</h2>
+        <p class="intro history-intro">Recent attempts are saved on this device.</p>
+        <div id="history-list" class="history-list"></div>
+        <div class="action-row"><span id="history-summary" class="record"></span><button id="history-back" class="secondary">Back to the manor</button></div>
+      </div>
+    </section>
+
+    <section id="pause-overlay" class="overlay hidden">
+      <div class="panel narrow center">
+        <div class="eyebrow">The night can wait</div><h2>Run paused</h2>
+        <p class="intro centered-intro">Take a breath, wanderer. The creatures will be waiting.</p>
+        <div class="build-panel pause-build-panel"><div class="build-title">Your arsenal</div><div id="pause-build-list" class="pause-build-list"></div></div>
+        <div class="action-row pause-actions"><button id="resume-button" class="primary">Resume run</button><button id="quit-button" class="secondary">Leave run</button></div>
+      </div>
+    </section>
+
+    <section id="end-overlay" class="overlay hidden">
+      <div class="panel narrow center">
+        <div class="eyebrow" id="end-eyebrow">The night claims another</div><h2 id="end-title">Run ended</h2>
+        <p id="end-message" class="intro centered-intro">Your story ends here, but the gold you gathered remains yours.</p>
+        <div class="result-stats">
+          <div><small>Survived</small><strong id="result-time">00:00</strong></div>
+          <div><small>Slain</small><strong id="result-kills">0</strong></div>
+          <div><small>Gold earned</small><strong id="result-gold">0</strong></div>
+        </div>
+        <button id="return-button" class="primary">Return to the manor</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="game.js" defer></script>
+</body>
+</html>
