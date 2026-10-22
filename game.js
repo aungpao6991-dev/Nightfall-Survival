@@ -160,7 +160,7 @@
       ];
       const state = {
         mode: "menu", selected: "arcanist", player: null, enemies: [], projectiles: [], gems: [], particles: [], slashes: [], hazards: [], hitTexts: [],
-        time: 0, kills: 0, gold: 0, totalGold: 0, level: 1, xp: 0, xpNext: 8,
+        time: 0, kills: 0, gold: 0, totalGold: 0, level: 1, xp: 0, xpNext: 8, rerolls: 0,
         inventory: {}, passives: {}, might: 1, magnet: 1, moveSpeed: 180,
         spawnTimer: 0, attackTimer: 0, damageTimer: 0, guardianSpawned: false, bossDefeated: false, redDeathSpawned: false,
         chest: null, chestQueue: [], keys: {}, lastFrame: 0, shopLevel: 0, history: [],
@@ -321,6 +321,7 @@
         state.level = 1;
         state.xp = 0;
         state.xpNext = 8;
+        state.rerolls = 0;
         state.might = (character.stats.might || 1) + state.shopLevel * .05;
         state.magnet = 1;
         state.passiveTimers = {};
@@ -725,6 +726,10 @@
       function openLevelUp() {
         if (state.mode !== "running") return;
         state.mode = "levelup";
+        renderUpgradeChoices();
+        setOverlay("level-overlay");
+      }
+      function renderUpgradeChoices() {
         const candidates = [];
         const available = upgradePool.filter((item) => {
           if (item.type === "weapon") return !state.inventory[item.name] && Object.keys(state.inventory).length < 5;
@@ -767,7 +772,29 @@
             <span class="rarity-label">${rarityForItem(item.name).name} · ${rarityForItem(item.name).power.toFixed(2)}× item power</span>
           </button>`).join("");
         document.querySelectorAll("[data-choice]").forEach((button) => button.addEventListener("click", () => chooseUpgrade(selected[Number(button.dataset.choice)])));
-        setOverlay("level-overlay");
+        $("level-reroll").disabled = state.rerolls < 1;
+        $("level-reroll").textContent = `Reroll · ${state.rerolls}`;
+      }
+      function rerollUpgrades() {
+        if (state.mode !== "levelup" || state.rerolls < 1) return;
+        state.rerolls--;
+        renderUpgradeChoices();
+      }
+      function skipLevelUp() {
+        if (state.mode !== "levelup") return;
+        state.rerolls += 2;
+        continueAfterLevelUp();
+      }
+      function continueAfterLevelUp() {
+        state.mode = "running";
+        setOverlay(null);
+        updateHud();
+        if (state.xp >= state.xpNext) {
+          state.xp -= state.xpNext;
+          state.level++;
+          state.xpNext = Math.ceil(state.xpNext * 1.32 + 3);
+          openLevelUp();
+        }
       }
       function chooseUpgrade(item) {
         if (!item) return;
@@ -793,15 +820,7 @@
           syncPassiveStats();
           state.player.hp = Math.min(state.player.maxHp, state.player.hp + 30);
         }
-        state.mode = "running";
-        setOverlay(null);
-        updateHud();
-        if (state.xp >= state.xpNext) {
-          state.xp -= state.xpNext;
-          state.level++;
-          state.xpNext = Math.ceil(state.xpNext * 1.32 + 3);
-          openLevelUp();
-        }
+        continueAfterLevelUp();
       }
       function tryEvolution() {
         if (!state.chest || state.chest.opened) return;
@@ -1829,6 +1848,8 @@
       $("back-to-modes").addEventListener("click", showModeScreen);
       $("cancel-character").addEventListener("click", () => $("character-confirm").classList.add("hidden"));
       $("confirm-character").addEventListener("click", startGame);
+      $("level-reroll").addEventListener("click", rerollUpgrades);
+      $("level-skip").addEventListener("click", skipLevelUp);
       $("history-button").addEventListener("click", showHistory);
       $("history-back").addEventListener("click", () => { showModeScreen(); setOverlay("menu-overlay"); });
       $("pause-button").addEventListener("click", () => {

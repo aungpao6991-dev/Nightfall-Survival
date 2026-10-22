@@ -109,7 +109,10 @@
     .primary:hover, .shop-button:hover { filter: brightness(1.12); transform: translateY(-1px); }
     .primary:disabled { opacity: .45; cursor: not-allowed; transform: none; }
     .secondary { border-color: rgba(255,255,255,.16); background: rgba(255,255,255,.05); color: var(--cream); }
+    .secondary:disabled { opacity: .45; cursor: not-allowed; }
     .record { color: var(--muted); font-size: 11px; }
+    .level-actions { margin-top: 16px; }
+    .level-action-buttons { display: flex; gap: 9px; }
     .shop-row { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-top: 16px; padding: 12px 14px; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; }
     .shop-row strong { display: block; font-size: 12px; }
     .shop-row small { color: var(--muted); font-size: 10px; }
@@ -178,6 +181,9 @@
       .choice-card strong { display: inline; }
       .choice-card small { margin-top: 7px; }
       .choice-card .level-tag { margin-top: 7px; }
+      .level-actions { flex-direction: column; }
+      .level-action-buttons { width: 100%; }
+      .level-action-buttons button { flex: 1; padding: 10px 8px; }
       .history-row { grid-template-columns: 1fr 1fr; }
       .history-stat { text-align: left; }
     }

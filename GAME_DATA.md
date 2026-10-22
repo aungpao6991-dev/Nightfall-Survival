@@ -10,6 +10,7 @@ This document records the playable content and combat values currently implement
 - Weapons attack automatically. Weapon inventory is limited to 5 distinct weapons; weapon levels cap at 5.
 - Press Space to dash in the current movement direction (or the last facing direction when standing still). A dash lasts 0.16 seconds, moves at 3.2× normal movement speed, grants 0.2 seconds of invulnerability, and has a 1.1-second cooldown.
 - A level-up offers up to 3 choices. The first XP threshold is 8; each later threshold is `ceil(previous threshold × 1.32 + 3)`.
+- At a level-up, spending one reroll replaces the offered choices. Skipping a level-up grants 2 rerolls for later level-ups; rerolls reset when a new run begins.
 - Weapon level affects its base damage by `1 + 0.16 × weapon level` (so level 1 is ×1.16 and level 5 is ×1.80). Some weapons also improve count, range, or behavior separately.
 - General weapon base damage is:
 
